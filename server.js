@@ -17,13 +17,32 @@ mongoose.connect(mongoURI)
     })
     .catch((err) =>{
         console.error('Error connecting to MongoDB', err);
-    } );
+    });
 
 
 app.use('/api/users', userRoute);
 app.use('/', (req, res) =>{
     res.send('API is running....')
 });
+app.post('/api/users/:id',(req,res) =>{
+ const user = req.params.id;
+ res.send(`Create user with ID: ${user}`);
+});
+
+app.get('/api/users/:id', (req,res) =>{
+    const user = req.params.id;
+    res.send(`Get user with ID: ${user}`);
+});
+
+app.put('/api/users/:id', (req,res) =>{
+    const user = req.params.id;
+    res.send(`Update user with ID: ${user}`);
+});
+
+app.delete('/api/users/:id', (req,res) => {
+    const user = req.params.id;
+    res.send(`Delete user with ID: ${user}`);
+})
 
 app.listen(port, () =>{
     console.log('Server is running on port', port);
