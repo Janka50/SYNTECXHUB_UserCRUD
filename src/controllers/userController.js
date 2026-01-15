@@ -1,62 +1,61 @@
-// controllers/userController.js
 const User = require('../models/User');
 
-// Create a new user (POST /api/users)
+// CREATE
 exports.createUser = async (req, res) => {
   try {
-    const user = new User(req.body);
+    const { username, email } = req.body;
+    const user = new User({ username, email });
     await user.save();
-    res.status(201).send(user); // 201 Created
+    res.status(201).json({ message: 'User created successfully', user });
   } catch (error) {
-    res.status(400).send(error); // 400 Bad Request
+    res.status(400).json({ message: 'Failed to create user' });
   }
 };
 
-// Read all users (GET /api/users)
+// READ ALL
 exports.getUsers = async (req, res) => {
   try {
     const users = await User.find();
-    res.status(200).send(users); // 200 OK
-  } catch (error) {
-    res.status(500).send(error); // 500 Internal Server Error
+    res.status(200).json(users);
+  } catch {
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Read a single user by ID (GET /api/users/:id)
+// READ ONE
 exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).send({ message: 'User not found' }); // 404 Not Found
-    }
-    res.status(200).send(user);
-  } catch (error) {
-    res.status(500).send(error);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.status(200).json(user);
+  } catch {
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-// Update a user by ID (PUT /api/users/:id)
+// UPDATE
 exports.updateUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!user) {
-      return res.status(404).send({ message: 'User not found' });
-    }
-    res.status(200).send(user);
-  } catch (error) {
-    res.status(400).send(error);
+    const { username, email } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { username, email },
+      { new: true, runValidators: true }
+    );
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.status(200).json(user);
+  } catch {
+    res.status(400).json({ message: 'Update failed' });
   }
 };
 
-// Delete a user by ID (DELETE /api/users/:id)
+// DELETE
 exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) {
-      return res.status(404).send({ message: 'User not found' });
-    }
-    res.status(200).send({ message: 'User deleted successfully', user }); // 200 OK
-  } catch (error) {
-    res.status(500).send(error);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch {
+    res.status(500).json({ message: 'Server error' });
   }
 };
